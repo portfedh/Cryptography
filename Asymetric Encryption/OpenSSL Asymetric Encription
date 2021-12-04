@@ -1,0 +1,111 @@
+OpenSSL Commands
+################
+
+Basic Commands
+##############
+$ openssl version
+   # Version used of openssl
+
+$ which oppenssl
+   # Where its installed
+
+$ oppenssl help
+   # All commands
+
+
+Encrypt data with a Symetric message
+####################################
+
+Create a sample file
+   $ echo "This is my secret message" > message.txt
+
+Encrypt a file
+   $ openssl enc -aes-256-cbc -in message.txt -out message.txt.enc
+      # A password will be requested.
+      # Test password: password
+
+Decrypt a file
+   $ openssl enc -aes-256-cbc -d -in message.txt.enc -out message.txt
+      # A password will be requested
+      # Output file will be created
+      # If no output file is created, it will display it in the rerminal.
+
+Encrypt data with Asymetric Encryption
+######################################
+
+Creating Public and Private Keys
+################################
+
+Create folders to represent users
+   $ mkdir user1;mkdir user2
+   User 1 folder (Represents User 1)
+   User 2 folder (Represents User 2)
+
+Generate RSA Private key for User 1:
+   $ openssl genrsa -des3 -out user1_private_key.pem 2048
+      # A password will be requested
+      # Test password: password
+
+Generate RSA Public key for User 1:
+   $ openssl rsa -in user1_private_key.pem -outform PEM -pubout -out user1_public_key.pem
+      # -in passes private key
+      # -outform is in PEM format
+      # -pubout
+      # -output public key in clear text
+      # Will ask for password from private key
+      # Test password: password
+
+Generate RSA Private key for User 2:
+   $ openssl genrsa -des3 -out user2_private_key.pem 2048
+         # Test password: password2
+
+Generate RSA Public key for User 2:
+   $ openssl rsa -in user2_private_key.pem -outform PEM -pubout -out user2_public_key.pem
+
+
+User 1 will encrypt a file and send to user2
+############################################
+
+User 1 must have User 2 Public key. 
+   $ cp user2_public_key.pem ../user1
+      # We are currently at user 2 folder
+      # Copy public key of user 2 into user 1 folder.
+
+Create a symetric key
+   $ openssl rand -hex -out user1_random_key.bin 64
+   $ cat user1_random_key.bin
+
+Create the file to encrypt
+   $  echo "This is my confidential message" > confidential.txt
+
+Encrypt the file
+   $ openssl enc -aes-256-cbc -salt -in confidential.txt -out confidential.txt.enc -pass file:./user1_random_key.bin
+      # uses random key as password
+
+# Whoever has:
+   - The encrypted file: confidential.txt.enc
+   - The key: user1_random_key.bin 64
+   Will be able to see the data. 
+
+5. Encrypt user1_random_key.bin 64 with User2 public key.
+   $ openssl rsautl -encrypt -inkey user2_public_key.pem -pubin -in user1_random_key.bin -out user1_random_key.bin.enc
+
+# Email encrypted files to user 2
+   - user1_random_key.bin.enc
+   - confidential.txt.enc
+
+User 2 will decrypt a file
+##########################
+
+Copy files to user2 folder
+   $ cp confidential.txt.enc ../user2;cp user1_random_key.bin.enc ../user2
+
+Decrypt random key
+   $ openssl rsautl -decrypt -inkey user2_private_key.pem -in user1_random_key.bin.enc -out user1_random_key.bin
+
+Decrypt confidential file
+   $ openssl enc -d -aes-256-cbc -in confidential.txt.enc -out confidential.txt -pass file:./user1_random_key.bin
+
+# RSA has a max encryption size
+# To encrypt large files, de use symetric encryption
+# And encrypt the AES password file and not the file itself.
