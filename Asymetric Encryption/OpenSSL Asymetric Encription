@@ -20,12 +20,12 @@ Create a sample file
    $ echo "This is my secret message" > message.txt
 
 Encrypt a file
-   $ openssl enc -aes-256-cbc -in message.txt -out message.txt.enc
+   $ openssl enc -aes-256-cbc -pbkdf2 -in message.txt -out message.txt.enc
       # A password will be requested.
       # Test password: password
 
 Decrypt a file
-   $ openssl enc -aes-256-cbc -d -in message.txt.enc -out message.txt
+   $ openssl enc -aes-256-cbc -pbkdf2 -d -in message.txt.enc -out message.txt
       # A password will be requested
       # Output file will be created
       # If no output file is created, it will display it in the rerminal.

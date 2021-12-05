@@ -1,0 +1,53 @@
+OpenSSL Commands
+################
+
+Hashing Functions
+#################
+
+Checksum
+########
+$ echo "I am learning hash functions" | cksum
+   # Displays hash value
+   # last value represents bytes
+
+$ echo "I am learning hash functions" > message1.txt
+$ cat message1.txt 
+$ cksum message1.txt
+   # Saves message to message1.txt
+   # Displays the message from the file
+   # Displays hash value
+   # Its the same hash value than before
+
+$ cksum message1.txt > message1.txt.cksum
+   # Writes the output of the hash value into a text file
+
+$ cksum message*
+$ cksum <file1> <file2>
+   # Wildcards can be used to check several files at once
+   # You can also add each file individually
+   # You can keep a log of files to see if they have changed
+
+Md5sum
+######
+$ echo "Hello" | md5sum
+   # Displays larger hash value than cksum
+   # Has the same uses as cksum
+   # Substitute command "md5sum" with "md5" in Mac.
+
+$ md5sum message* > md5hashes.txt
+$ md5sum -c md5hashes.txt
+   # Creates a filename with the hashes for all files
+   # Compares filenames and hashes
+   # Quickly lets you know if a file was altered
+   # You can keep a file with hashes in another computer and compare
+   # -c Does not work for md5 in mac
+
+Sha256
+######
+$ sha256sum <filename>
+$ sha256sum -c <filename>
+$ shasum -a 256 <filename> # for Mac
+   # Most commonly used
+   # when you download a file the SHA 256 hash is given
+   # You can compare its value vs whats in the website
+   # -c Does not work for md5 in mac
